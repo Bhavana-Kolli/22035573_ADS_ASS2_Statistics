@@ -65,4 +65,19 @@ def read_df(filename):
     return df_countries, df_years 
 
 
-df_c, df_y = read_df("access to electricity.csv")
+# read the data for "Access to electricity (% of population)" 
+df_electricity_c, df_electricity_y = read_df("access to electricity.csv")
+
+# read the data for "CO2 emissions (metric tons per capita)"
+df_emissions_c, df_emissions_y = read_df("co2 emissions.csv")
+
+#summary statistics for "Access to electricity(% of population)"of whole world
+print("\nAccess to electricity statistics for whole world:")
+print(df_electricity_c.describe())
+print("\nAccess to electricity statistics from 1990 to 2020:")
+print(df_electricity_y.describe())
+#summary statistics for "CO2 emissions(metric tons per capita)"of whole world
+print("\nCO2 emissions statistics for whole world:")
+print(df_emissions_c.describe())
+print("\nCO2 emissions statistics from 1990 to 2020:")
+print(df_emissions_y.describe())

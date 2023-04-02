@@ -17,6 +17,7 @@ import stats
 
 # Here functions for all plots are defined
 
+
 def read_df(filename):
     """
     Reads a dataframe in World Bank format from a CSV file.
@@ -72,12 +73,38 @@ df_electricity_c, df_electricity_y = read_df("access to electricity.csv")
 df_emissions_c, df_emissions_y = read_df("co2 emissions.csv")
 
 #summary statistics for "Access to electricity(% of population)"of whole world
-print("\nAccess to electricity statistics for whole world:")
+print("\nAccess to electricity summary statistics for whole world:")
 print(df_electricity_c.describe())
-print("\nAccess to electricity statistics from 1990 to 2020:")
+print("\nAccess to electricity summary statistics from 1990 to 2020:")
 print(df_electricity_y.describe())
 #summary statistics for "CO2 emissions(metric tons per capita)"of whole world
-print("\nCO2 emissions statistics for whole world:")
+print("\nCO2 emissions summary statistics for whole world:")
 print(df_emissions_c.describe())
-print("\nCO2 emissions statistics from 1990 to 2020:")
+print("\nCO2 emissions summary statistics from 1990 to 2020:")
 print(df_emissions_y.describe())
+
+# select a few countries to compare statistical properties
+countries = ['United States', 'India', 'China', 'United Kingdom', 'Nigeria']
+
+# calculate mean, median, and standard deviation for each country
+
+# "Access to electricity(% of population)" for a few countries
+elect_stats = pd.DataFrame({'Mean': df_electricity_c[countries].mean(), 
+                            'Median': df_electricity_c[countries].median(), 
+                            'Std Dv': df_electricity_c[countries].std()})
+
+# "CO2 emissions(metric tons per capita)" for a few countries
+emiss_stats = pd.DataFrame({'Mean': df_emissions_c[countries].mean(), 
+                            'Median': df_emissions_c[countries].median(), 
+                            'Std Dev': df_emissions_c[countries].std()})
+
+# print the results 
+print("\nAccess to electricity statistics for a few countries:")
+print(elect_stats)
+
+print("\nCO2 emissions statistics for a few countries:")
+print(emiss_stats)
+
+df_electricity_c_mean = df_electricity_c.groupby('Year').mean()
+
+print(df_electricity_c_mean)

@@ -12,7 +12,7 @@ Assignment 2: Statistics and trends
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import stats
 
 # Here functions for all plots are defined
 
@@ -113,6 +113,43 @@ def plot_elect_and_emiss(df_electricity, df_emissions, country_list):
     plt.show()
 
 
+def plot_skew_kurt(df, title):
+    """
+    Plot skewness and kurtosis for a given DataFrame.
+
+    Parameters:
+        df(pandas.DataFrame): The DataFrame to calculate skewness and kurtosis
+        title (str): The title to use for the plot.
+
+    """
+    # Calculate skewness and kurtosis for each column
+    skewness = pd.DataFrame({'Skewness': stats.skew(df)})
+    kurtosis = pd.DataFrame({'Kurtosis': stats.kurtosis(df)})
+    sk_df = skewness.join(kurtosis)
+
+    # Plot the results
+    fig, axs = plt.subplots(1, 2, figsize=(12, 4))
+    
+    # Plot the skewness chart
+    sk_df['Skewness'].plot(kind='bar', ax=axs[0], 
+                           title=title + ' Skewness')
+    
+    # Plot the kurtosis chart
+    sk_df['Kurtosis'].plot(kind='bar', ax=axs[1], 
+                           title=title + ' Kurtosis')
+    
+    # Add labels to the y axes
+    axs[0].set_ylabel('Skewness')
+    axs[1].set_ylabel('Kurtosis')
+    
+    # Add spacing between the plots
+    plt.tight_layout()
+    
+    # Display the plot
+    plt.show()
+    
+
+
 # Main Program
 
 
@@ -185,4 +222,67 @@ print(corr_countries)
 
 # Trend of CO2 emissions and access to electricity over time forfew countries.
 plot_elect_and_emiss(df_electricity_c, df_emissions_c, countries)
+
+
+
+# Plot-2 (line chart) --------------------------------------------------
+
+
+# plot line chart of correlation coefficient over time
+plt.plot(corr_time.index, corr_time)
+plt.xlabel('Year')
+plt.ylabel('Correlation coefficient')
+plt.title('Correlation between electricity access and CO2 emissions over time')
+plt.show()
+
+
+
+# Plot-3 (Scatter plot) --------------------------------------------------
+
+
+# plot of access to electricity and CO2 emissions for all countries in 2019
+plt.scatter(df_electricity_c.iloc[:,-1], df_emissions_c.iloc[:,-1],  
+            c='b', s=50)
+
+# set the axis labels and title
+plt.xlabel('Access to electricity (%)')
+plt.ylabel('CO2 emissions (metric tons per capita)')
+plt.title('Access to electricity vs CO2 emissions in 2019')
+plt.show()
+
+
+# Plot-4 (Distribution) ---------------------------
+
+
+# bar chart distribution of access to electricity and CO2 emissions
+# across all years for the selected countries
+
+# years with 5 year increament from 1990 to 2019
+years = [1990, 1995, 2000, 2005, 2010, 2015, 2019]
+
+# subplot
+fig, axs = plt.subplots(1, 2, figsize=(12, 5))
+
+# CO2 emissions distributions over time for a few countries
+df_emissions_c.loc[years, countries].plot.bar(ax=axs[0], xlabel='Years', 
+                                              ylabel='CO2 Emissions')
+axs[0].legend(bbox_to_anchor=(1, 1), loc='upper left')
+
+# access to electricity over time for a few countries
+df_electricity_c.loc[years, countries].plot.bar(ax=axs[1], xlabel='Years', 
+                                                ylabel='Access to Electricity')
+axs[1].legend(bbox_to_anchor=(1, 1), loc='upper left')
+
+plt.tight_layout()
+plt.show()
+
+
+# Plot-5(skewness and kurtosis)--------------------------------------------
+
+
+# skewness and kurtosis of Access to electricity for selected countries
+plot_skew_kurt(df_electricity_c[countries], 'Access to electricity')
+# skewness and kurtosis of CO2 emissions for selected countries
+plot_skew_kurt(df_emissions_c[countries], 'CO2 emissions')
+
 

@@ -110,6 +110,36 @@ def plot_elect_and_emiss(df_electricity, df_emissions, country_list):
 
     # Adjust the spacing and show the plot
     plt.tight_layout()
+    plt.savefig('456.png', dpi=300)
+    plt.show()
+
+
+def plot_distribution(df_emissions, df_electricity, countries):
+    """
+    Plots the distribution of access to electricity and CO2 emissions 
+    across all years for the selected countries
+    Parameters:
+    df_emissions (pandas.DataFrame): contains CO2 emissions data
+    df_electricity (pandas.DataFrame): contains access to electricity data
+    countries (list): list of country names to be included in the plot
+
+    Returns:
+    None
+    """
+    # years with 5 year increment from 1990 to 2019
+    years = [1990, 1995, 2000, 2005, 2010, 2015, 2019]
+    # subplot
+    fig, axs = plt.subplots(1, 2, figsize=(12, 4))
+    # CO2 emissions distributions over time for a few countries
+    df_emissions_c.loc[years, countries].plot.bar(ax=axs[0], xlabel='Years', 
+                                              ylabel='CO2 Emissions')
+    axs[0].legend(bbox_to_anchor=(1, 1), loc='upper left')
+    # access to electricity over time for a few countries
+    df_electricity_c.loc[years, countries].plot.bar(ax=axs[1], xlabel='Years', 
+                                                ylabel='Access to Electricity')
+    axs[1].legend(bbox_to_anchor=(1, 1), loc='upper left')
+    plt.tight_layout()
+    plt.savefig('123.png', dpi=300)
     plt.show()
 
 
@@ -201,8 +231,15 @@ print("\nCO2 emissions statistics for a few countries:")
 print(emiss_stats)
 
 
-# Correlations--------------------------------------------------
+# Plot-1 (Time Series) ----------------------------------------------------
 
+
+# Trend of CO2 emissions and access to electricity over time forfew countries.
+plot_elect_and_emiss(df_electricity_c, df_emissions_c, countries)
+
+
+
+# Plot-2 (line chart) ----------------------------------------------------
 
 # calculate correlation coefficients between "Access to electricity"
 # and "CO2 emissions" over time
@@ -216,18 +253,6 @@ corr_countries = df_electricity_c.corrwith(df_emissions_c)
 print("\nCorrelation between electricity access and CO2 emissions for world:")
 print(corr_countries)
 
-
-# Plot-1 (Time Series) ------------------------------------------------
-
-
-# Trend of CO2 emissions and access to electricity over time forfew countries.
-plot_elect_and_emiss(df_electricity_c, df_emissions_c, countries)
-
-
-
-# Plot-2 (line chart) --------------------------------------------------
-
-
 # plot line chart of correlation coefficient over time
 plt.plot(corr_time.index, corr_time)
 plt.xlabel('Year')
@@ -236,53 +261,44 @@ plt.title('Correlation between electricity access and CO2 emissions over time')
 plt.show()
 
 
+# Plot-3 (Stacked Bar) --------------------------------------------------
 
-# Plot-3 (Scatter plot) --------------------------------------------------
+# calculate mean access to electricity for the year 2019 
+df_electricity_y_mean = df_electricity_y.groupby('Country Name')[2019].mean()
+# calculate mean CO2 emissions for the year 2019 
+df_emissions_y_mean = df_emissions_y.groupby('Country Name')[2019].mean()
 
 
-# plot of access to electricity and CO2 emissions for all countries in 2019
-plt.scatter(df_electricity_c.iloc[:,-1], df_emissions_c.iloc[:,-1],  
-            c='b', s=50)
+# bar chart for mean access to electricity and mean CO2 emissions 
+# for the year 2019 for all selected countries
+fig, ax = plt.subplots(figsize=(8, 6))
 
-# set the axis labels and title
-plt.xlabel('Access to electricity (%)')
-plt.ylabel('CO2 emissions (metric tons per capita)')
-plt.title('Access to electricity vs CO2 emissions in 2019')
+ax.bar(df_electricity_y_mean[countries].index, 
+       df_electricity_y_mean[countries].values, label='Access to Electricity')
+ax.bar(df_emissions_y_mean[countries].index, 
+       df_emissions_y_mean[countries].values, label='CO2 Emissions')
+
+ax.set_xlabel('Country')
+ax.set_ylabel('Mean Value')
+ax.set_title('Mean of Access to Electricity and Mean CO2 Emissions for 2019')
+ax.legend()
+
 plt.show()
 
 
-# Plot-4 (Distribution) ---------------------------
+# Plot-4 (Distribution) ----------------------------------------------------
 
 
 # bar chart distribution of access to electricity and CO2 emissions
 # across all years for the selected countries
-
-# years with 5 year increament from 1990 to 2019
-years = [1990, 1995, 2000, 2005, 2010, 2015, 2019]
-
-# subplot
-fig, axs = plt.subplots(1, 2, figsize=(12, 5))
-
-# CO2 emissions distributions over time for a few countries
-df_emissions_c.loc[years, countries].plot.bar(ax=axs[0], xlabel='Years', 
-                                              ylabel='CO2 Emissions')
-axs[0].legend(bbox_to_anchor=(1, 1), loc='upper left')
-
-# access to electricity over time for a few countries
-df_electricity_c.loc[years, countries].plot.bar(ax=axs[1], xlabel='Years', 
-                                                ylabel='Access to Electricity')
-axs[1].legend(bbox_to_anchor=(1, 1), loc='upper left')
-
-plt.tight_layout()
-plt.show()
+plot_distribution(df_emissions_c, df_electricity_c, countries)
 
 
-# Plot-5(skewness and kurtosis)--------------------------------------------
+# Plot-5 (skewness and kurtosis)--------------------------------------------
 
 
 # skewness and kurtosis of Access to electricity for selected countries
 plot_skew_kurt(df_electricity_c[countries], 'Access to electricity')
 # skewness and kurtosis of CO2 emissions for selected countries
 plot_skew_kurt(df_emissions_c[countries], 'CO2 emissions')
-
 

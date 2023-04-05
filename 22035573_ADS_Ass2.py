@@ -319,3 +319,4 @@ plot_distribution(df_emissions_c, df_electricity_c, countries)
 plot_skew_kurt(df_electricity_c[countries], 'Access to electricity')
 # skewness and kurtosis of CO2 emissions for selected countries
 plot_skew_kurt(df_emissions_c[countries], 'CO2 emissions')
+

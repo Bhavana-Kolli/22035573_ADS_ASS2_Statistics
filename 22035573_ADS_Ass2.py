@@ -31,38 +31,38 @@ def read_df(filename):
         df_years(pd.DataFrame): 
             a dataframe with countries as rows and years as columns
     """
-    
+
     # read the CSV file
     df = pd.read_csv(filename, skiprows=4)
-    
+
     # drops unnecessary columns
-    df.drop(['Country Code', 'Indicator Name', 'Indicator Code'], axis=1, 
+    df.drop(['Country Code', 'Indicator Name', 'Indicator Code'], axis=1,
             inplace=True)
-    
+
     # sets the index to the country name
     df = df.set_index('Country Name')
-    
+
     # drops rows and columns with all missing data
     df.dropna(axis=0, how='all', inplace=True)
     df.dropna(axis=1, how='all', inplace=True)
-    
+
     # transpose the dataframe
     df_t = df.transpose()
-    
+
     # convert the index to years
     df_t.index = pd.to_datetime(df_t.index, format='%Y').year
-    
+
     # sets column and index names
     df_t.columns.name = 'Country Name'
     df_t.index.name = 'Year'
-    
+
     # a dataframe countries as columns
     df_countries = df_t
-    
+
     # a dataframe with years as columns
     df_years = df_countries.T
-    
-    return df_countries, df_years 
+
+    return df_countries, df_years
 
 
 def plot_elect_and_emiss(df_electricity, df_emissions, country_list):
@@ -76,41 +76,42 @@ def plot_elect_and_emiss(df_electricity, df_emissions, country_list):
         and years.
         df_emissions (pd.DataFrame): A DataFrame containing the CO2 emissions 
         per capita for different countries and years.
-        
+
         country_list (list): A list of countries to plot.
 
     """
-    
+
     # Create a 2x2 subplot and flatten it to iterate over it.
     fig, axs = plt.subplots(2, 2, figsize=(12, 8))
     axs = axs.flat
-    
+
     # Iterate over the list of countries to plot.
     for country in country_list:
-        
+
         # Get the next axis in the flattened subplot.
         ax = next(axs)
-        
+
         # Plot the access to electricity on the left axis.
         df_electricity[country].plot(ax=ax, label='Electricity Access')
-        
+
         # Create a twin axis on the right and plot the CO2 emissions.
         ax2 = ax.twinx()
         df_emissions[country].plot(ax=ax2, label='CO2 Emissions', color='red')
-        
+
         # Set labels and titles.
         ax.set_xlabel('Year')
         ax.set_ylabel('Percentage of population')
         ax2.set_ylabel('Metric tons per capita')
-        ax.set_title(f'Electricity access and CO2 emissions over time in {country}')
-        
+        ax.set_title(
+            f'Electricity access and CO2 emissions over time in {country}')
+
         # Add legends to each axis.
         ax.legend(loc='upper left')
         ax2.legend(loc='upper right')
 
     # Adjust the spacing and show the plot
     plt.tight_layout()
-    plt.savefig('456.png', dpi=300)
+    plt.savefig('time series.png', dpi=300)
     plt.show()
 
 
@@ -128,18 +129,27 @@ def plot_distribution(df_emissions, df_electricity, countries):
     """
     # years with 5 year increment from 1990 to 2019
     years = [1990, 1995, 2000, 2005, 2010, 2015, 2019]
+
     # subplot
     fig, axs = plt.subplots(1, 2, figsize=(12, 4))
+
     # CO2 emissions distributions over time for a few countries
-    df_emissions_c.loc[years, countries].plot.bar(ax=axs[0], xlabel='Years', 
-                                              ylabel='CO2 Emissions')
+    df_emissions_c.loc[years, countries].plot.bar(ax=axs[0], xlabel='Years',
+                                                  ylabel='metric tons/capita')
+    
+    axs[0].set_title('CO2 emissions across all years for few countries')
     axs[0].legend(bbox_to_anchor=(1, 1), loc='upper left')
+    
     # access to electricity over time for a few countries
-    df_electricity_c.loc[years, countries].plot.bar(ax=axs[1], xlabel='Years', 
-                                                ylabel='Access to Electricity')
+    df_electricity_c.loc[years, countries].plot.bar(ax=axs[1], xlabel='Years',
+                                                    ylabel='% of population')
+    
+    axs[1].set_title('Electricity access across all years for few countries')
     axs[1].legend(bbox_to_anchor=(1, 1), loc='upper left')
+
+    # Show the plot
     plt.tight_layout()
-    plt.savefig('123.png', dpi=300)
+    plt.savefig('distribution.png', dpi=300)
     plt.show()
 
 
@@ -159,25 +169,25 @@ def plot_skew_kurt(df, title):
 
     # Plot the results
     fig, axs = plt.subplots(1, 2, figsize=(12, 4))
-    
+
     # Plot the skewness chart
-    sk_df['Skewness'].plot(kind='bar', ax=axs[0], 
+    sk_df['Skewness'].plot(kind='bar', ax=axs[0],
                            title=title + ' Skewness')
-    
+
     # Plot the kurtosis chart
-    sk_df['Kurtosis'].plot(kind='bar', ax=axs[1], 
+    sk_df['Kurtosis'].plot(kind='bar', ax=axs[1],
                            title=title + ' Kurtosis')
-    
+
     # Add labels to the y axes
     axs[0].set_ylabel('Skewness')
     axs[1].set_ylabel('Kurtosis')
-    
+
     # Add spacing between the plots
     plt.tight_layout()
-    
-    # Display the plot
+
+    # Display the plot and save it
+    plt.savefig('skew kurt.png', dpi=300)
     plt.show()
-    
 
 
 # Main Program
@@ -185,8 +195,7 @@ def plot_skew_kurt(df, title):
 
 # Reading Files-------------------------------------------------------
 
-
-# read the data for "Access to electricity (% of population)" 
+# read the data for "Access to electricity (% of population)"
 df_electricity_c, df_electricity_y = read_df("access to electricity.csv")
 
 # read the data for "CO2 emissions (metric tons per capita)"
@@ -196,13 +205,13 @@ df_emissions_c, df_emissions_y = read_df("co2 emissions.csv")
 # Summary Statistics--------------------------------------------------
 
 
-#summary statistics for "Access to electricity(% of population)"of whole world
+# summary statistics for "Access to electricity(% of population)"of whole world
 print("\nAccess to electricity summary statistics for whole world:")
 print(df_electricity_c.describe())
 print("\nAccess to electricity summary statistics from 1990 to 2019:")
 print(df_electricity_y.describe())
 
-#summary statistics for "CO2 emissions(metric tons per capita)"of whole world
+# summary statistics for "CO2 emissions(metric tons per capita)"of whole world
 print("\nCO2 emissions summary statistics for whole world:")
 print(df_emissions_c.describe())
 print("\nCO2 emissions summary statistics from 1990 to 2019:")
@@ -214,16 +223,16 @@ countries = ['United States', 'India', 'China', 'Brazil']
 # calculate mean, median, and standard deviation for each country
 
 # "Access to electricity(% of population)" for a few countries
-elect_stats = pd.DataFrame({'Mean': df_electricity_c[countries].mean(), 
-                            'Median': df_electricity_c[countries].median(), 
+elect_stats = pd.DataFrame({'Mean': df_electricity_c[countries].mean(),
+                            'Median': df_electricity_c[countries].median(),
                             'Std Dv': df_electricity_c[countries].std()})
 
 # "CO2 emissions(metric tons per capita)" for a few countries
-emiss_stats = pd.DataFrame({'Mean': df_emissions_c[countries].mean(), 
-                            'Median': df_emissions_c[countries].median(), 
+emiss_stats = pd.DataFrame({'Mean': df_emissions_c[countries].mean(),
+                            'Median': df_emissions_c[countries].median(),
                             'Std Dev': df_emissions_c[countries].std()})
 
-# print the results 
+# print the results
 print("\nAccess to electricity statistics for a few countries:")
 print(elect_stats)
 
@@ -238,8 +247,8 @@ print(emiss_stats)
 plot_elect_and_emiss(df_electricity_c, df_emissions_c, countries)
 
 
-
 # Plot-2 (line chart) ----------------------------------------------------
+
 
 # calculate correlation coefficients between "Access to electricity"
 # and "CO2 emissions" over time
@@ -254,28 +263,35 @@ print("\nCorrelation between electricity access and CO2 emissions for world:")
 print(corr_countries)
 
 # plot line chart of correlation coefficient over time
-plt.plot(corr_time.index, corr_time)
+plt.plot(corr_time.index, corr_time, label='Correlation')
+
+# Add labels
 plt.xlabel('Year')
 plt.ylabel('Correlation coefficient')
 plt.title('Correlation between electricity access and CO2 emissions over time')
+plt.legend()
+
+# Save the plot and show it
+plt.savefig('line chart.png', dpi=300)
 plt.show()
 
 
 # Plot-3 (Stacked Bar) --------------------------------------------------
 
-# calculate mean access to electricity for the year 2019 
+
+# calculate mean access to electricity for the year 2019
 df_electricity_y_mean = df_electricity_y.groupby('Country Name')[2019].mean()
-# calculate mean CO2 emissions for the year 2019 
+# calculate mean CO2 emissions for the year 2019
 df_emissions_y_mean = df_emissions_y.groupby('Country Name')[2019].mean()
 
 
-# bar chart for mean access to electricity and mean CO2 emissions 
+# bar chart for mean access to electricity and mean CO2 emissions
 # for the year 2019 for all selected countries
 fig, ax = plt.subplots(figsize=(8, 6))
 
-ax.bar(df_electricity_y_mean[countries].index, 
+ax.bar(df_electricity_y_mean[countries].index,
        df_electricity_y_mean[countries].values, label='Access to Electricity')
-ax.bar(df_emissions_y_mean[countries].index, 
+ax.bar(df_emissions_y_mean[countries].index,
        df_emissions_y_mean[countries].values, label='CO2 Emissions')
 
 ax.set_xlabel('Country')
@@ -283,6 +299,8 @@ ax.set_ylabel('Mean Value')
 ax.set_title('Mean of Access to Electricity and Mean CO2 Emissions for 2019')
 ax.legend()
 
+# save and show the plot
+plt.savefig('stacked bar.png', dpi=300)
 plt.show()
 
 
@@ -301,4 +319,3 @@ plot_distribution(df_emissions_c, df_electricity_c, countries)
 plot_skew_kurt(df_electricity_c[countries], 'Access to electricity')
 # skewness and kurtosis of CO2 emissions for selected countries
 plot_skew_kurt(df_emissions_c[countries], 'CO2 emissions')
-
